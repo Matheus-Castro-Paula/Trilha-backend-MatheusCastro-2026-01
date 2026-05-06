@@ -1,3 +1,8 @@
+/**
+ * Ponto de entrada da API.
+ * Configura o servidor Express, middlewares globais, rotas e
+ * conexão com o banco de dados via Sequelize.
+ */
 const express = require("express");
 require("dotenv").config();
 const userRoutes = require("./routes/userRoutes");
