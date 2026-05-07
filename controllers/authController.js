@@ -5,20 +5,37 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
 /**
- * Controlador de usuários para registro, login e recuperação de senha.
+ * Controlador de autenticação.
+ * Responsável pelo registro, login e recuperação de senha.
  */
-class UserController {
+class AuthController {
   static async register(req, res) {
     try {
       const { name, email, password } = req.body;
 
-      const userExists = await User.findOne({ where: { email } });
-      if (userExists) {
-        return res.status(400).json({ message: "E-mail já cadastrado!" });
+      if (!name || !email || !password) {
+        return res.status(400).json({
+          error: "Nome, e-mail e senha são obrigatórios.",
+        });
       }
 
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      const emailRegex = /\S+@\S+\.\S+/;
+
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          error: "Formato de e-mail inválido.",
+        });
+      }
+
+      const userExists = await User.findOne({ where: { email } });
+
+      if (userExists) {
+        return res.status(400).json({
+          error: "E-mail já cadastrado!",
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = await User.create({
         name,
@@ -38,7 +55,10 @@ class UserController {
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ message: "Erro interno no servidor." });
+
+      return res.status(500).json({
+        error: "Erro interno no servidor.",
+      });
     }
   }
 
@@ -49,22 +69,42 @@ class UserController {
   static async login(req, res) {
     try {
       const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({
+          error: "E-mail e senha são obrigatórios.",
+        });
+      }
+
+      if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET não configurado.");
+      }
+
       const user = await User.findOne({ where: { email } });
 
       if (!user) {
-        return res.status(404).json({ error: "E-mail ou senha incorretos." });
+        return res.status(401).json({
+          error: "E-mail ou senha incorretos.",
+        });
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
-        return res.status(401).json({ error: "E-mail ou senha incorretos." });
+        return res.status(401).json({
+          error: "E-mail ou senha incorretos.",
+        });
       }
 
       const token = jwt.sign(
-        { id: user.id, role: user.role },
+        {
+          id: user.id,
+          role: user.role,
+        },
         process.env.JWT_SECRET,
-        { expiresIn: "1d" },
+        {
+          expiresIn: "1d",
+        },
       );
 
       return res.status(200).json({
@@ -73,7 +113,10 @@ class UserController {
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Erro interno ao realizar login." });
+
+      return res.status(500).json({
+        error: "Erro interno ao realizar login.",
+      });
     }
   }
 
@@ -85,20 +128,28 @@ class UserController {
     try {
       const { email } = req.body;
 
-      const user = await User.findOne({ where: { email } });
-      if (!user) {
-        return res.status(404).json({ error: "E-mail não encontrado." });
+      if (!email) {
+        return res.status(400).json({
+          error: "O e-mail é obrigatório.",
+        });
       }
 
-      // Token hexadecimal de 40 caracteres
+      const user = await User.findOne({ where: { email } });
+
+      if (!user) {
+        return res.status(200).json({
+          message: "Se o e-mail existir, as instruções foram enviadas.",
+        });
+      }
+
       const token = crypto.randomBytes(20).toString("hex");
 
-      // Define expiração por segurança (1 hora)
       const expiresIn = new Date();
       expiresIn.setHours(expiresIn.getHours() + 1);
 
       user.resetPasswordToken = token;
       user.resetPasswordExpires = expiresIn;
+
       await user.save();
 
       const transporter = nodemailer.createTransport({
@@ -126,9 +177,10 @@ class UserController {
       });
     } catch (error) {
       console.error(error);
-      return res
-        .status(500)
-        .json({ error: "Erro ao processar solicitação de recuperação." });
+
+      return res.status(500).json({
+        error: "Erro ao processar solicitação de recuperação.",
+      });
     }
   }
 
@@ -139,21 +191,33 @@ class UserController {
     try {
       const { token, newPassword } = req.body;
 
-      const user = await User.findOne({ where: { resetPasswordToken: token } });
+      if (!token || !newPassword) {
+        return res.status(400).json({
+          error: "Token e nova senha são obrigatórios.",
+        });
+      }
+
+      const user = await User.findOne({
+        where: {
+          resetPasswordToken: token,
+        },
+      });
 
       if (!user) {
-        return res.status(400).json({ error: "Token inválido." });
+        return res.status(400).json({
+          error: "Token inválido.",
+        });
       }
 
       const agora = new Date();
+
       if (agora > user.resetPasswordExpires) {
-        return res
-          .status(400)
-          .json({ error: "Token expirado. Solicite a recuperação novamente." });
+        return res.status(400).json({
+          error: "Token expirado. Solicite a recuperação novamente.",
+        });
       }
 
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
 
       user.password = hashedPassword;
       user.resetPasswordToken = null;
@@ -161,14 +225,17 @@ class UserController {
 
       await user.save();
 
-      return res.status(200).json({ message: "Senha redefinida com sucesso!" });
+      return res.status(200).json({
+        message: "Senha redefinida com sucesso!",
+      });
     } catch (error) {
       console.error(error);
-      return res
-        .status(500)
-        .json({ error: "Erro interno ao redefinir a senha." });
+
+      return res.status(500).json({
+        error: "Erro interno ao redefinir a senha.",
+      });
     }
   }
 }
 
-module.exports = UserController;
+module.exports = AuthController;
