@@ -18,6 +18,10 @@ module.exports = {
       price: {
         type: Sequelize.DECIMAL,
       },
+      stock: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
