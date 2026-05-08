@@ -9,7 +9,7 @@ const isAdmin = require("../middlewares/isAdmin");
 router.get("/", ProductController.getAll);
 router.get("/:id", ProductController.getById);
 
-// Rotas privadas de Produtos (/products)
+// Rotas privadas de Produtos (admin)(/products)
 router.post("/", authMiddleware, isAdmin, ProductController.create);
 router.put("/:id", authMiddleware, isAdmin, ProductController.update);
 router.delete("/:id", authMiddleware, isAdmin, ProductController.remove);
