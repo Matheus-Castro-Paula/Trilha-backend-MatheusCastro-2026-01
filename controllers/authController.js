@@ -154,7 +154,7 @@ class AuthController {
 
       const transporter = nodemailer.createTransport({
         host: "sandbox.smtp.mailtrap.io",
-        port: 2525,
+        port: process.env.MAILTRAP_PORT,
         auth: {
           user: process.env.MAILTRAP_USER,
           pass: process.env.MAILTRAP_PASS,
