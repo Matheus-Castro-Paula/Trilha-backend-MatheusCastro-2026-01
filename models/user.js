@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
      * Um usuário pode possuir diversas avaliações (Reviews).
      */
     static associate(models) {
-      // User.hasMany(models.Review, { foreignKey: 'userId', as: 'reviews' });
+      User.hasMany(models.Review, { foreignKey: "userId", as: "reviews" });
     }
   }
 
