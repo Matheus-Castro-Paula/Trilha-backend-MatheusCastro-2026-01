@@ -11,7 +11,13 @@ router.get("/me", authMiddleware, UserController.getMe);
 // Rotas privadas de Usuários (admin) (/users)
 router.get("/", authMiddleware, isAdmin, UserController.getAll);
 router.get("/:id", authMiddleware, isAdmin, UserController.getById);
-router.put("/:id", authMiddleware, isAdmin, UserController.update);
 router.delete("/:id", authMiddleware, isAdmin, UserController.remove);
+
+/**
+ * Rotas privadas de users (default e admin) (/users).
+ * Usuários comuns conseguem atualizar apenas as próprias users.
+ * Administradores conseguem atualizar qualquer user.
+ */
+router.put("/:id", authMiddleware, UserController.update);
 
 module.exports = router;

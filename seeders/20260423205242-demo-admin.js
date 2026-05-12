@@ -1,5 +1,5 @@
 "use strict";
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 /** * Seeder para criação do usuário Administrador inicial do sistema.
  * @type {import('sequelize-cli').Migration}

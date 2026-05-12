@@ -32,6 +32,21 @@ class ReviewController {
         });
       }
 
+      const existingReview = await Review.findOne({
+        where: {
+          userId: userId,
+          productId: productId,
+        },
+      });
+
+      if (existingReview) {
+        return res.status(409).json({
+          success: false,
+          error: "Você já avaliou este produto.",
+          existingReview: existingReview,
+        });
+      }
+
       const newReview = await Review.create({
         rating,
         comment,
