@@ -98,24 +98,16 @@ class UserController {
   }
 
   /**
-   * [PUT] Atualizar os detalhes de um usuário específico (admin).
-   * Rota privada.
+   * [PUT] Atualizar os detalhes de um usuário.
+   * Rota privada (dono do perfil ou Admin).
    */
   static async update(req, res) {
     try {
       const { id } = req.params;
       const { name, email, role } = req.body;
 
-      if (email !== undefined) {
-        const emailRegex = /\S+@\S+\.\S+/;
-
-        if (!emailRegex.test(email)) {
-          return res.status(400).json({
-            success: false,
-            error: "Formato de e-mail inválido.",
-          });
-        }
-      }
+      const userLoggedId = req.user.id;
+      const userRole = req.user.role;
 
       if (isNaN(id)) {
         return res.status(400).json({
@@ -124,21 +116,50 @@ class UserController {
         });
       }
 
-      const user = await User.findByPk(id);
-
-      if (!user) {
+      const userToUpdate = await User.findByPk(id);
+      if (!userToUpdate) {
         return res.status(404).json({
           success: false,
           error: "Usuário não encontrado.",
         });
       }
+      if (userToUpdate.id !== userLoggedId && userRole !== "admin") {
+        return res.status(403).json({
+          success: false,
+          error: "Você só tem permissão para atualizar o seu próprio perfil.",
+        });
+      }
+
+      if (role !== undefined) {
+        const validRoles = ["default", "admin"];
+
+        if (!validRoles.includes(role)) {
+          return res.status(400).json({
+            success: false,
+            error:
+              "Opção de role inválida. As únicas permitidas são: 'default' ou 'admin'.",
+          });
+        }
+
+        if (userRole !== "admin") {
+          return res.status(403).json({
+            success: false,
+            error: "Você não tem permissão para alterar cargo.",
+          });
+        }
+      }
 
       if (email !== undefined) {
-        const emailAlreadyExists = await User.findOne({
-          where: { email },
-        });
+        const emailRegex = /\S+@\S+\.\S+/;
+        if (!emailRegex.test(email)) {
+          return res.status(400).json({
+            success: false,
+            error: "Formato de e-mail inválido.",
+          });
+        }
 
-        if (emailAlreadyExists && emailAlreadyExists.id !== user.id) {
+        const emailAlreadyExists = await User.findOne({ where: { email } });
+        if (emailAlreadyExists && emailAlreadyExists.id !== userToUpdate.id) {
           return res.status(400).json({
             success: false,
             error: "Este e-mail já está em uso.",
@@ -146,27 +167,25 @@ class UserController {
         }
       }
 
-      // Atualiza apenas os campos enviados
       const updatedData = {};
-
       if (name !== undefined) updatedData.name = name;
       if (email !== undefined) updatedData.email = email;
       if (role !== undefined) updatedData.role = role;
 
-      await user.update(updatedData);
+      await userToUpdate.update(updatedData);
 
       return res.status(200).json({
         success: true,
+        message: "Perfil atualizado com sucesso.",
         data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
+          id: userToUpdate.id,
+          name: userToUpdate.name,
+          email: userToUpdate.email,
+          role: userToUpdate.role,
         },
       });
     } catch (error) {
       console.error(error);
-
       return res.status(500).json({
         success: false,
         error: "Erro ao atualizar o usuário.",

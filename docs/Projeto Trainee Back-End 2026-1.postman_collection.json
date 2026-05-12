@@ -122,7 +122,7 @@
       "name": "User",
       "item": [
         {
-          "name": "List Authenticated Users",
+          "name": "List Authenticated User",
           "request": {
             "auth": {
               "type": "bearer",
