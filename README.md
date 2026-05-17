@@ -16,6 +16,7 @@ O projeto consiste em um sistema de catálogo de produtos onde usuários podem s
 - Recuperação de senha via e-mail
 - Dockerização do banco de dados
 - Proteção de rotas privadas
+- Upload de imagens de produtos na nuvem (Cloudinary + Multer)
 
 ---
 
@@ -28,6 +29,8 @@ O desenvolvimento foi dividido em fases estratégicas para garantir uma base só
 - **Semana 3 (Segurança e Autenticação):** Implementação do sistema de segurança da API. Utilizei JWT para controle de sessão e Bcrypt para a criptografia das senhas dos usuários. Também nesta fase, integrei o Nodemailer com o serviço Mailtrap para simular o fluxo de recuperação de senha por e-mail.
 
 - **Semanas 4-5 (Regras de Negócio e CRUD):** Desenvolvimento da lógica principal da aplicação. Criei os controladores e rotas para o CRUD completo de todas as entidades. Foi implementado o sistema de RBAC (Role-Based Access Control), utilizando middlewares para validar se um usuário é comum ou administrador, protegendo as rotas de criação e exclusão de produtos e a gestão de avaliações alheias.
+
+- **Semana 6 -Semana final- (Regras, Avaliações e Nuvem):** Criação de CTs (Casos de Testes) para testar e confirmar funcionalidades, refinamento de código de acordo com bugs encontrados e implementação de upload de imagens multipart na nuvem com Cloudinary e tratamento avançado de erros.
 
 ---
 
@@ -44,6 +47,7 @@ As tecnologias foram escolhidas visando simplicidade, escalabilidade e alinhamen
 - **JWT (JSON Web Token):** utilizado para autenticação stateless e gerenciamento seguro de sessão dos usuários.
 - **Bcrypt:** utilizado para criptografia das senhas armazenadas no banco de dados, aumentando a segurança da aplicação.
 - **Nodemailer & Mailtrap:** utilizados para simular o fluxo de recuperação de senha via e-mail em ambiente de desenvolvimento.
+- **Cloudinary & Multer:** utilizados para possibilitar a implementação de imagens nos produtos via nuvem.
 
 ---
 
@@ -67,12 +71,14 @@ projeto-trainee-backend-2026/
 │
 ├── middlewares/       # Interceptadores (Autenticação e Controle de Acesso)
 │   ├── authMiddleware.js
-│   └── isAdmin.js
+│   ├── isAdmin.js
+│   └── uploadMiddleware.js
 │
 ├── migrations/        # Versionamento e histórico de criação das tabelas
 │   ├── 01-create-user-13042026.js
 │   ├── 02-create-product-13042026.js
-│   └── 03-create-review-13042026.js
+│   ├── 03-create-review-13042026.js
+│   └── 04-create-uploadImagem-12052026.js
 │
 ├── models/            # Representação das tabelas e relacionamentos (ORM)
 │   ├── index.js
@@ -90,10 +96,12 @@ projeto-trainee-backend-2026/
 │   └── 20260423205242-demo-admin.js
 │
 ├── .env.example       # Arquivo exemplo do ".env"
+├── .gitignore         # Arquivo para ignorar pastas e arquivos no GitHub
 ├── docker-compose.yml # Orquestrador de serviços do Docker
 ├── Dockerfile         # Receita de containerização da aplicação
 ├── index.js           # Ponto de entrada e inicialização do servidor
 ├── package.json       # Dependências e scripts do projeto
+├── README.md          # Arquivo para documentar o projeto
 ├── yarn.lock          # Árvore de dependências (Yarn)
 └── node_modules/      # Bibliotecas instaladas (Ignorado no GitHub)
 ```
@@ -165,18 +173,20 @@ Aqui está o resumo das rotas disponíveis. _(A documentação interativa comple
    yarn install
    ```
 3. **Configuração de Ambiente:**
-   - Crie um arquivo `.env` na raiz do projeto copiando o modelo `.env.example` e preencha com as suas credenciais de Banco de Dados, JWT Secret e Mailtrap.
+   - Crie um arquivo `.env` na raiz do projeto copiando o modelo `.env.example`.
+   - Preencha com as suas credenciais de Banco de Dados, JWT Secret, Mailtrap e Cloudinary.
 
-4. **Suba o Banco de Dados (Docker):**
+4. **Suba a infraestrutura (Docker):**
 
    ```bash
    docker-compose up -d
    ```
 
-5. **Execute as Migrations:**
+5. **Execute as Migrations e Seeders:**
 
    ```bash
    yarn sequelize-cli db:migrate
+   yarn sequelize-cli db:seed:all
    ```
 
 6. **Inicie a API:**
@@ -192,6 +202,6 @@ Aqui está o resumo das rotas disponíveis. _(A documentação interativa comple
 A documentação interativa com requisições prontas está na pasta raiz do projeto.
 
 1. Abra o Postman e importe o arquivo `Projeto Trainee Back-End 2026-1.postman_collection.json`.
-2. A coleção é inteligente: ao disparar o `POST Login`, o Postman captura o seu token automaticamente e injeta em todas as rotas privadas. Basta sair testando sem precisar copiar e colar tokens manualmente!
+2. A coleção é inteligente: ao disparar o `POST Login`, o Postman captura o seu token automaticamente e injeta em todas as rotas privadas. Basta sair testando sem precisar copiar e colar tokens manualmente.
 
 ### Desenvolvido por Matheus de Castro Paula durante o processo trainee 2026/1.
