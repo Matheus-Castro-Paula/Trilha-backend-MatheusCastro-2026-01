@@ -17,7 +17,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Usuário Sacrifício\",\n  \"email\": \"sacrificio@teste.com\",\n  \"password\": \"senha123\"\n}",
+              "raw": "{\n  \"name\": \"Matheus Castro\",\n  \"email\": \"matheus@teste.com\",\n  \"password\": \"senha123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -79,7 +79,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@admin.com\"\n}",
+              "raw": "{\n  \"email\": \"matheus@teste.com\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -101,7 +101,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"eb2e8451ad1dc534f9dc47b164eb5dbc60a25244\",\n  \"newPassword\": \"admin123\"\n}",
+              "raw": "{\n  \"token\": \"f688496d26f1e86499c4599f89cc316bbbf168d0\",\n  \"newPassword\": \"senha123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -197,7 +197,7 @@
           "response": []
         },
         {
-          "name": "Update User by ID (Admin)",
+          "name": "Update User by ID",
           "request": {
             "auth": {
               "type": "bearer",
@@ -213,7 +213,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"admin@admin.com\"\n}",
+              "raw": "{\n    \"email\": \"matheus@teste.com\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -227,7 +227,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "2"
                 }
               ]
             }
@@ -293,13 +293,39 @@
             "method": "POST",
             "header": [],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Teclado Mecânico\",\n  \"description\": \"Teclado RGB switch blue\",\n  \"price\": 250.50,\n  \"stock\": 10\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Mouse Gamer",
+                  "type": "text",
+                  "uuid": "d18d4476-39cb-4a5b-952f-0140022ccee4"
+                },
+                {
+                  "key": "description",
+                  "value": "Mouse de última geração",
+                  "type": "text",
+                  "uuid": "91aa78ca-6db3-4638-8b9c-cb3f8f80ee78"
+                },
+                {
+                  "key": "price",
+                  "value": "250",
+                  "type": "text",
+                  "uuid": "bd53a294-4225-4f76-aea1-f9180c86c8a4"
+                },
+                {
+                  "key": "stock",
+                  "value": "10",
+                  "type": "text",
+                  "uuid": "66ea905a-e27a-4a61-a159-d4682e7b5644"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "uuid": "f5adca93-7b53-4932-804e-f08ae027c2b9",
+                  "src": "postman-cloud:///1f146ffe-1880-4a70-9171-e96765c688cf"
                 }
-              }
+              ]
             },
             "url": {
               "raw": "{{baseUrl}}/products",
@@ -363,13 +389,27 @@
             "method": "PUT",
             "header": [],
             "body": {
-              "mode": "raw",
-              "raw": "{ \"price\": 199.90 }",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "a93d8e71-f9e1-4a31-84e5-e5d8740e109c"
+                },
+                {
+                  "key": "price",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "ca7f75a0-cad4-4a9f-9563-862b0eaf6a66"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "uuid": "8cafb99f-36a2-492f-9d94-cfe47e505ed2",
+                  "value": null
                 }
-              }
+              ]
             },
             "url": {
               "raw": "{{baseUrl}}/products/:id",
@@ -378,7 +418,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "3"
                 }
               ]
             }
@@ -407,7 +447,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "2"
+                  "value": "3"
                 }
               ]
             }
@@ -436,7 +476,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productId\":\"3\",\n    \"rating\":4,\n    \"comment\":\"Produto muito bom e agradável, recomendo!\"\n}",
+              "raw": "{\n    \"productId\":4,\n    \"rating\":3,\n    \"comment\":\"Produto meia boca!\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -485,7 +525,7 @@
               "variable": [
                 {
                   "key": "productId",
-                  "value": "3"
+                  "value": "4"
                 }
               ]
             }
@@ -523,7 +563,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "2"
+                  "value": "7"
                 }
               ]
             }
@@ -561,7 +601,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "4"
+                  "value": "8"
                 }
               ]
             }

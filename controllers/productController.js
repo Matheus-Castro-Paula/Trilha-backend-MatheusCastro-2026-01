@@ -20,23 +20,31 @@ class ProductController {
         });
       }
 
-      if (typeof price !== "number" || price < 0) {
+      const parsedPrice = Number(price);
+      if (isNaN(parsedPrice) || parsedPrice < 0) {
         return res.status(400).json({
           error: "O preço deve ser um número positivo.",
         });
       }
 
-      if (stock !== undefined && (typeof stock !== "number" || stock < 0)) {
-        return res.status(400).json({
-          error: "O estoque deve ser um número positivo.",
-        });
+      let parsedStock = stock;
+      if (stock !== undefined) {
+        parsedStock = Number(stock);
+        if (isNaN(parsedStock) || parsedStock < 0) {
+          return res.status(400).json({
+            error: "O estoque deve ser um número positivo.",
+          });
+        }
       }
+
+      const image_url = req.file ? req.file.path : null;
 
       const newProduct = await Product.create({
         name,
         description,
-        price,
-        stock,
+        price: parsedPrice,
+        stock: parsedStock,
+        image_url,
       });
 
       return res.status(201).json({
@@ -47,6 +55,7 @@ class ProductController {
           description: newProduct.description,
           price: newProduct.price,
           stock: newProduct.stock,
+          image_url: newProduct.image_url,
         },
       });
     } catch (error) {
@@ -119,29 +128,34 @@ class ProductController {
         });
       }
 
-      if (price !== undefined) {
-        if (typeof price !== "number" || price < 0) {
-          return res.status(400).json({
-            error: "O preço deve ser um número positivo.",
-          });
-        }
-      }
-
-      if (stock !== undefined) {
-        if (typeof stock !== "number" || stock < 0) {
-          return res.status(400).json({
-            error: "O estoque deve ser um número positivo.",
-          });
-        }
-      }
-
-      // Atualiza apenas os campos enviados
       const updatedData = {};
 
       if (name !== undefined) updatedData.name = name;
       if (description !== undefined) updatedData.description = description;
-      if (price !== undefined) updatedData.price = price;
-      if (stock !== undefined) updatedData.stock = stock;
+
+      if (price !== undefined) {
+        const parsedPrice = Number(price);
+        if (isNaN(parsedPrice) || parsedPrice < 0) {
+          return res.status(400).json({
+            error: "O preço deve ser um número positivo.",
+          });
+        }
+        updatedData.price = parsedPrice;
+      }
+
+      if (stock !== undefined) {
+        const parsedStock = Number(stock);
+        if (isNaN(parsedStock) || parsedStock < 0) {
+          return res.status(400).json({
+            error: "O estoque deve ser um número positivo.",
+          });
+        }
+        updatedData.stock = parsedStock;
+      }
+
+      if (req.file) {
+        updatedData.image_url = req.file.path;
+      }
 
       await product.update(updatedData);
 
@@ -153,11 +167,11 @@ class ProductController {
           description: product.description,
           price: product.price,
           stock: product.stock,
+          image_url: product.image_url,
         },
       });
     } catch (error) {
       console.error(error);
-
       return res.status(500).json({
         error: "Erro ao atualizar o produto.",
       });
