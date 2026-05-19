@@ -182,6 +182,8 @@ Aqui está o resumo das rotas disponíveis. _(A documentação interativa comple
    docker compose up -d
    ```
 
+   - **!! Nota !! :** Após executar o comando do Docker, aguarde cerca de 10 a 20 segundos antes de rodar as migrations. Esse é o tempo necessário para o servidor do MySQL inicializar completamente dentro do contêiner e estar pronto para receber conexões.
+
 5. **Execute as Migrations e Seeders:**
 
    ```bash
