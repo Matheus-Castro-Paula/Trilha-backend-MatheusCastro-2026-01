@@ -91,9 +91,10 @@ class UserController {
       });
     } catch (error) {
       console.error(error);
-      return res
-        .status(500)
-        .json({ success: false, error: "Erro ao buscar usuário autenticado." });
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao buscar usuário autenticado.",
+      });
     }
   }
 
