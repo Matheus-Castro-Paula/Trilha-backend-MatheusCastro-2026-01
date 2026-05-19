@@ -15,6 +15,7 @@ class AuthController {
 
       if (!name || !email || !password) {
         return res.status(400).json({
+          success: false,
           error: "Nome, e-mail e senha são obrigatórios.",
         });
       }
@@ -23,6 +24,7 @@ class AuthController {
 
       if (!emailRegex.test(email)) {
         return res.status(400).json({
+          success: false,
           error: "Formato de e-mail inválido.",
         });
       }
@@ -31,6 +33,7 @@ class AuthController {
 
       if (userExists) {
         return res.status(400).json({
+          success: false,
           error: "E-mail já cadastrado!",
         });
       }
@@ -45,6 +48,7 @@ class AuthController {
       });
 
       return res.status(201).json({
+        success: true,
         message: "Usuário criado com sucesso!",
         user: {
           id: newUser.id,
@@ -57,6 +61,7 @@ class AuthController {
       console.error(error);
 
       return res.status(500).json({
+        success: false,
         error: "Erro interno no servidor.",
       });
     }
@@ -72,6 +77,7 @@ class AuthController {
 
       if (!email || !password) {
         return res.status(400).json({
+          success: false,
           error: "E-mail e senha são obrigatórios.",
         });
       }
@@ -84,6 +90,7 @@ class AuthController {
 
       if (!user) {
         return res.status(401).json({
+          success: false,
           error: "E-mail ou senha incorretos.",
         });
       }
@@ -92,6 +99,7 @@ class AuthController {
 
       if (!isPasswordValid) {
         return res.status(401).json({
+          success: false,
           error: "E-mail ou senha incorretos.",
         });
       }
@@ -108,6 +116,7 @@ class AuthController {
       );
 
       return res.status(200).json({
+        success: true,
         message: "Login realizado com sucesso!",
         token,
       });
@@ -115,6 +124,7 @@ class AuthController {
       console.error(error);
 
       return res.status(500).json({
+        success: false,
         error: "Erro interno ao realizar login.",
       });
     }
@@ -130,6 +140,7 @@ class AuthController {
 
       if (!email) {
         return res.status(400).json({
+          success: false,
           error: "O e-mail é obrigatório.",
         });
       }
@@ -138,6 +149,7 @@ class AuthController {
 
       if (!user) {
         return res.status(200).json({
+          success: true,
           message: "Se o e-mail existir, as instruções foram enviadas.",
         });
       }
@@ -173,12 +185,14 @@ class AuthController {
       });
 
       return res.status(200).json({
+        success: true,
         message: "Se o e-mail existir, as instruções foram enviadas.",
       });
     } catch (error) {
       console.error(error);
 
       return res.status(500).json({
+        success: false,
         error: "Erro ao processar solicitação de recuperação.",
       });
     }
@@ -193,6 +207,7 @@ class AuthController {
 
       if (!token || !newPassword) {
         return res.status(400).json({
+          success: false,
           error: "Token e nova senha são obrigatórios.",
         });
       }
@@ -205,6 +220,7 @@ class AuthController {
 
       if (!user) {
         return res.status(400).json({
+          success: false,
           error: "Token inválido.",
         });
       }
@@ -213,6 +229,7 @@ class AuthController {
 
       if (agora > user.resetPasswordExpires) {
         return res.status(400).json({
+          success: false,
           error: "Token expirado. Solicite a recuperação novamente.",
         });
       }
@@ -226,12 +243,14 @@ class AuthController {
       await user.save();
 
       return res.status(200).json({
+        success: true,
         message: "Senha redefinida com sucesso!",
       });
     } catch (error) {
       console.error(error);
 
       return res.status(500).json({
+        success: false,
         error: "Erro interno ao redefinir a senha.",
       });
     }

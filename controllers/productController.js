@@ -14,27 +14,32 @@ class ProductController {
     try {
       const { name, description, price, stock } = req.body;
 
-      if (!name || price === undefined) {
+      if (!name || name.trim() === "" || price === undefined || price === "") {
         return res.status(400).json({
+          success: false,
           error: "Nome e preço são obrigatórios.",
         });
       }
 
       const parsedPrice = Number(price);
-      if (isNaN(parsedPrice) || parsedPrice < 0) {
+      if (isNaN(parsedPrice) || parsedPrice <= 0) {
         return res.status(400).json({
+          sucess: false,
           error: "O preço deve ser um número positivo.",
         });
       }
 
       let parsedStock = stock;
-      if (stock !== undefined) {
+      if (stock !== undefined && stock !== "") {
         parsedStock = Number(stock);
         if (isNaN(parsedStock) || parsedStock < 0) {
           return res.status(400).json({
+            success: false,
             error: "O estoque deve ser um número positivo.",
           });
         }
+      } else if (stock === "") {
+        parsedStock = 0;
       }
 
       const image_url = req.file ? req.file.path : null;
@@ -48,6 +53,7 @@ class ProductController {
       });
 
       return res.status(201).json({
+        success: true,
         message: "Produto criado com sucesso!",
         product: {
           id: newProduct.id,
@@ -62,6 +68,7 @@ class ProductController {
       console.error(error);
 
       return res.status(500).json({
+        success: false,
         error: "Erro interno ao criar produto.",
       });
     }
@@ -80,6 +87,7 @@ class ProductController {
       console.error(error);
 
       return res.status(500).json({
+        success: false,
         error: "Erro ao buscar produtos.",
       });
     }
@@ -97,15 +105,20 @@ class ProductController {
 
       if (!product) {
         return res.status(404).json({
+          success: false,
           error: "Produto não encontrado.",
         });
       }
 
-      return res.status(200).json(product);
+      return res.status(200).json({
+        success: true,
+        product,
+      });
     } catch (error) {
       console.error(error);
 
       return res.status(500).json({
+        success: false,
         error: "Erro ao buscar o produto.",
       });
     }
@@ -124,19 +137,35 @@ class ProductController {
 
       if (!product) {
         return res.status(404).json({
+          success: false,
           error: "Produto não encontrado.",
         });
       }
 
       const updatedData = {};
 
-      if (name !== undefined) updatedData.name = name;
+      if (name !== undefined) {
+        if (name.trim() === "") {
+          return res.status(400).json({
+            success: false,
+            error: "O nome do produto não pode ser vazio.",
+          });
+        }
+        updatedData.name = name;
+      }
       if (description !== undefined) updatedData.description = description;
 
       if (price !== undefined) {
-        const parsedPrice = Number(price);
-        if (isNaN(parsedPrice) || parsedPrice < 0) {
+        if (price === "") {
           return res.status(400).json({
+            success: false,
+            error: "O preço não pode ser vazio.",
+          });
+        }
+        const parsedPrice = Number(price);
+        if (isNaN(parsedPrice) || parsedPrice <= 0) {
+          return res.status(400).json({
+            success: false,
             error: "O preço deve ser um número positivo.",
           });
         }
@@ -144,9 +173,16 @@ class ProductController {
       }
 
       if (stock !== undefined) {
+        if (stock === "") {
+          return res.status(400).json({
+            success: false,
+            error: "O estoque não pode ser vazio.",
+          });
+        }
         const parsedStock = Number(stock);
         if (isNaN(parsedStock) || parsedStock < 0) {
           return res.status(400).json({
+            success: false,
             error: "O estoque deve ser um número positivo.",
           });
         }
@@ -160,6 +196,7 @@ class ProductController {
       await product.update(updatedData);
 
       return res.status(200).json({
+        success: true,
         message: "Produto atualizado com sucesso!",
         product: {
           id: product.id,
@@ -173,6 +210,7 @@ class ProductController {
     } catch (error) {
       console.error(error);
       return res.status(500).json({
+        success: false,
         error: "Erro ao atualizar o produto.",
       });
     }
@@ -190,6 +228,7 @@ class ProductController {
 
       if (!product) {
         return res.status(404).json({
+          success: false,
           error: "Produto não encontrado.",
         });
       }
@@ -197,12 +236,14 @@ class ProductController {
       await product.destroy();
 
       return res.status(200).json({
+        success: true,
         message: "Produto deletado com sucesso!",
       });
     } catch (error) {
       console.error(error);
 
       return res.status(500).json({
+        success: false,
         error: "Erro ao deletar o produto.",
       });
     }

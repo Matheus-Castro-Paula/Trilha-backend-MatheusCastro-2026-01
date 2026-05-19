@@ -179,7 +179,7 @@ Aqui está o resumo das rotas disponíveis. _(A documentação interativa comple
 4. **Suba a infraestrutura (Docker):**
 
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 5. **Execute as Migrations e Seeders:**
