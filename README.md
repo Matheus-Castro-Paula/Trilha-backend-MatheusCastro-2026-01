@@ -161,6 +161,8 @@ Aqui está o resumo das rotas disponíveis. _(A documentação interativa comple
 
 ## Como rodar o projeto localmente
 
+O projeto foi configurado para subir a aplicação completa (API + Banco de Dados) via Docker de forma unificada, permitindo a execução das migrations localmente com facilidade.
+
 1. **Clone o repositório:**
 
    ```bash
@@ -169,20 +171,33 @@ Aqui está o resumo das rotas disponíveis. _(A documentação interativa comple
    ```
 
 2. **Instale as dependências:**
+   - (Necessário para rodar os comandos do Sequelize localmente na sua máquina)
+
    ```bash
    yarn install
    ```
+
 3. **Configuração de Ambiente:**
    - Crie um arquivo `.env` na raiz do projeto copiando o modelo `.env.example`.
-   - Preencha com as suas credenciais de Banco de Dados, JWT Secret, Mailtrap e Cloudinary.
+   - Preencha com as suas credenciais (JWT Secret, Mailtrap e Cloudinary).
+   - **Importante:** Mantenha o `DB_HOST=127.0.0.1` no seu `.env` local para as migrations funcionarem perfeitamente. O Docker já está configurado para sobrescrever essa variável internamente de forma automática.
 
-4. **Suba a infraestrutura (Docker):**
+4. **Suba a infraestrutura (API e Banco de Dados via Docker):**
+   - Você pode optar por rodar qualquer um desses dois comandos abaixo:
+   - O primeiro constrói a imagem do container e deixa o terminal livre para próximos comandos, devido ao fato de rodar o cotêiner em segundo plano.
+   - Já o segundo constrói a imagem do container e ocupa aquele terminal para mostrar os Logs da API, tendo que abrir um segundo terminal para rodar os próximos comandos.
 
    ```bash
-   docker compose up -d
+   docker compose up -d --build
    ```
 
-   - **!! Nota !! :** Após executar o comando do Docker, aguarde cerca de 10 a 20 segundos antes de rodar as migrations. Esse é o tempo necessário para o servidor do MySQL inicializar completamente dentro do contêiner e estar pronto para receber conexões.
+   - **OU**
+
+   ```bash
+   docker compose up --build
+   ```
+
+   - **!! Nota !! :** Após executar estes comandos, aguarde cerca de 15 a 20 segundos antes de ir para o próximo passo. Esse é o tempo necessário para o servidor do MySQL inicializar completamente dentro do contêiner e estar pronto para receber as conexões.
 
 5. **Execute as Migrations e Seeders:**
 
@@ -191,13 +206,7 @@ Aqui está o resumo das rotas disponíveis. _(A documentação interativa comple
    yarn sequelize-cli db:seed:all
    ```
 
-6. **Inicie a API:**
-
-   ```bash
-   yarn dev
-   ```
-
-   - A API estará rodando em http://localhost:3000
+   - A API estará rodando em `http://localhost:3000` e pronta para receber requisições.
 
 ## Como testar a API (Postman)
 
